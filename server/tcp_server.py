@@ -2,6 +2,7 @@ import socket
 import argparse
 import logging
 import os
+import io
 from PIL import Image
 import time
 
@@ -17,10 +18,10 @@ class RapGeneratorServer:
         parser.add_argument("--port", default=9090, type=int)
         parser.add_argument('--host', default='0.0.0.0', type=str)
         parser.add_argument('--clients_number', default=1, type=int)
-        parser.add_argument('recv_bsize', type=int, default=1024)
+        parser.add_argument('--recv_bsize', type=int, default=1024)
         parser.add_argument('--img_size', type=str, default='100,100')
-        parser.add_argument('--img_mode', type=str, default='RGB')
-        parser.add_argument('--img_decoder_name', type=str, default='raw')
+        # parser.add_argument('--img_mode', type=str, default='RGB')
+        parser.add_argument('--img_format', type=str, default='jpeg')
         parser.add_argument('--tmp_dir', type=str, default='tmp')
         parser.add_argument('--no_debug', action='store_true', default=False)
 
@@ -42,6 +43,15 @@ class RapGeneratorServer:
         self.addrs.append(addr)
 
     def listen(self, con_id=0):
+        while True:
+            img = self.get_image(con_id)
+            if not img:
+                logger.info(f"Break connection from {self.addrs[con_id]}")
+                break
+            yield img
+        return
+
+    def get_image(self, con_id=0):
         conn = self.connections[con_id]
         datas = []
         while True:
@@ -50,17 +60,34 @@ class RapGeneratorServer:
             if not data:
                 logger.info("End data recvs")
                 break
+        if len(datas) == 0:
+            return
         img = self.data2image(data)
+        return img
 
     def data2image(self, data):
-        img = Image.frombytes(mode=self.args.img_mode,
-                              size=self.image_size,
-                              data=data,
-                              decoder_name=self.args.img_decoder_name)
+        img = Image.open(io.BytesIO(data))
+        # img = Image.frombytes(mode=self.args.img_mode,
+        #                       size=self.image_size,
+        #                       data=data,
+        #                       decoder_name=self.args.img_decoder_name)
+
         if self.debug:
             t = str(time.time())
-            name = os.path.join(self.args.tmp_dir, t + ".jpeg")
+            name = os.path.join(self.args.tmp_dir, t + "." + self.args.img_format)
             logger.info(f"Saving  image to {name}")
             img.save(name)
         return img
 
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    RapGeneratorServer.add_args(parser)
+    args = parser.parse_args()
+    server = RapGeneratorServer(args)
+
+    while True:
+        logger.info("Wait to new connection...")
+        server.accept()
+        for img in server.listen():
+            logger.debug("Process image")

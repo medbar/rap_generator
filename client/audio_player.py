@@ -34,7 +34,7 @@ class AudioPlayer:
     def play_sound_bg(self, sound_fn=None):
         if sound_fn is None:
             sound_fn = random.choice(self.all_minuses)
-        logger.info(f'Playing {sound_fn} background music.')
+        logger.info('Playing {} background music.'.format(sound_fn))
         pygame.mixer.music.load(sound_fn)
         pygame.mixer.music.play()
 

@@ -27,9 +27,9 @@ class TCPClient:
     def __init__(self, args):
         self.args = args
         self.socket = socket.socket()
-        logger.info(f"Connection to {self.args.host}:{self.args.port}")
+        logger.info("Connection to {}:{}".format(self.args.host, self.args.port))
         self.socket.connect((self.args.host, self.args.port))
-        logger.info(f"Connected")
+        logger.info("Connected")
 
     def send_img(self, img: Image):
         byte_stream = io.BytesIO()
@@ -70,7 +70,7 @@ def main():
     for img in camera.loop():
         client.send_img(img)
         music_bytes = client.get_response()
-        logger.info(f'Bytes len is {len(music_bytes)}')
+        logger.info('Bytes len is {}'.format(len(music_bytes)))
         player.play_sound_from_bytes(music_bytes)
 
 

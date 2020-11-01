@@ -39,7 +39,7 @@ class Camera:
         if debug:
             t = str(time.time())
             name = os.path.join(self.args.tmp_dir, t + ".jpeg")
-            logger.info(f"Saving  image to {name}")
+            logger.info("Saving  image to {}".format(name))
             img.save(name)
         return img
 

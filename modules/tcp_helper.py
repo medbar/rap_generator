@@ -13,7 +13,7 @@ def send_bytes(sock, bytes):
     logger.debug("Send header {}".format(header))
     sock.sendall(header)
     answ = str(sock.recv(1024))
-    logger.debug("Server answer is {}".format(answ))
+    logger.debug("Answer is {}".format(answ))
     logger.debug("Send data")
     sock.sendall(bytes)
     logger.debug("Done")
@@ -30,11 +30,15 @@ def recv_bytes(sock):
     sock.sendall(answ.encode())
     data_len = struct.unpack('!i', header)[0]
     logger.debug("Data len is {}".format(data_len))
-
-    data = sock.recv(data_len)
-    logger.debug("Got {} bytes".format(len(data)))
-    if not data:
-        logger.info("Got zero data")
-        return
-    return data
+    datas = []
+    while True:
+        data = sock.recv(data_len)
+        logger.debug("Got {} bytes. ({}/{})".format(len(data), len(data)+len(datas), data_len))
+        datas.extend(data)
+        if len(datas) == data_len:
+            break
+        if not data:
+            logger.info("Got zero data")
+            return datas
+    return datas
 

@@ -4,6 +4,9 @@ import tensorflow as tf
 from PIL import Image
 import numpy as np
 import argparse
+import sys
+sys.path.append("modules/object_detect/models/research")
+from modules.object_detect.models.research import object_detection
 from modules.object_detect.models.research.object_detection.utils import ops as utils_ops
 
 
@@ -87,9 +90,12 @@ def main():
     args = parser.parse_args()
     detector = ObjectDetect(args)
 
-    TEST_IMAGE_PATHS = ['tuta.jpg']
+    TEST_IMAGE_PATHS = ['modules/object_detect/tuta.jpg']
     for image_path in TEST_IMAGE_PATHS:
         img = Image.open(image_path)
         names = detector.get_objects_from_image(img)
         print(image_path, names)
 
+
+if __name__ == "__main__":
+    main()

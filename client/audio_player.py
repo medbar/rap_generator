@@ -23,7 +23,7 @@ class AudioPlayer:
         self.args = args
         self.all_minuses = [p for p in glob.glob(self.args.minus_dir + '/*.wav')]
         self.all_minuses.extend([p for p in glob.glob(self.args.minus_dir + '/*.mp3')])
-        pygame.mixer.pre_init(frequency=22050, size=-16, channels=1, buffer=512, devicename=None)
+        pygame.mixer.pre_init(frequency=22050, size=-16, channels=1, buffer=512)
         pygame.mixer.init()
         random.seed()
 

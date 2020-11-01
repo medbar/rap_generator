@@ -51,9 +51,15 @@ class RapGeneratorServer:
             img = self.get_image(con_id)
             if not img:
                 logger.info(f"Break connection from {self.addrs[con_id]}")
+                self.del_connection(con_id)
                 break
             yield img
         return
+
+    def del_connection(self, con_id=0):
+        self.connections[con_id].close()
+        self.connections.pop(con_id)
+        self.addrs.pop(con_id)
 
     def get_bytes(self, con_id=0):
         conn = self.connections[con_id]

@@ -27,7 +27,7 @@ def recv_bytes(sock):
     logger.debug("Got header {}".format(header))
     answ = 'Ready'
     logger.debug("Send answ '{}'".format(answ))
-    sock.sendall(answ)
+    sock.sendall(answ.encode())
     data_len = struct.unpack('!i', header)[0]
     logger.debug("Data len is {}".format(data_len))
 

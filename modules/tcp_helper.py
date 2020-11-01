@@ -30,11 +30,11 @@ def recv_bytes(sock):
     sock.sendall(answ.encode())
     data_len = struct.unpack('!i', header)[0]
     logger.debug("Data len is {}".format(data_len))
-    datas = []
+    datas = bytes()
     while True:
         data = sock.recv(data_len)
         logger.debug("Got {} bytes. ({}/{})".format(len(data), len(data)+len(datas), data_len))
-        datas.extend(data)
+        datas += data
         if len(datas) == data_len:
             break
         if not data:

@@ -4,8 +4,10 @@ from PIL import Image
 import io
 import logging
 
+
 from client.camera import Camera
 from client.audio_player import AudioPlayer
+from modules.tcp_helper import send_bytes, recv_bytes
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.DEBUG,
 )
@@ -33,23 +35,11 @@ class TCPClient:
         self.send_bytes(bytes)
 
     def send_bytes(self, bytes):
-        logger.debug("Send to server {} bytes".format(len(bytes)))
-        self.socket.send(bytes)
-        logger.debug("Send zero")
-        self.send_zero()
-        logger.debug("Send done")
-
-    def send_zero(self):
-        self.socket.send(''.encode())
+        send_bytes(self.socket, bytes)
 
     def get_response(self):
-        datas = []
-        while True:
-            data = self.socket.recv(self.args.recv_bsize)
-            if not data:
-                break
-            datas.extend(data)
-        return datas
+        data = recv_bytes(self.socket)
+        return data
 
 
 def main():

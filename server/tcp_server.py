@@ -6,6 +6,7 @@ import io
 from PIL import Image
 import time
 
+from modules.tcp_helper import send_bytes, recv_bytes
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.DEBUG,
 )
@@ -51,19 +52,15 @@ class RapGeneratorServer:
             yield img
         return
 
-    def get_image(self, con_id=0):
+    def get_bytes(self, con_id=0):
         conn = self.connections[con_id]
-        datas = []
-        logger.debug("Waiting image...")
-        while True:
-            data = conn.recv(1024)
-            logger.debug(f"recived {len(data)} bytes. Continue..")
-            datas.extend(data)
-            if not data:
-                logger.debug("End data recvs")
-                break
-        logger.debug(f"Client sent {len(datas)} bytes")
-        if len(datas) == 0:
+        data = recv_bytes(conn)
+        return data
+
+    def get_image(self, con_id=0):
+        logger.debug("Waiting for image...")
+        data = self.get_bytes(con_id)
+        if not data:
             return
         img = self.data2image(data)
         return img
@@ -84,12 +81,8 @@ class RapGeneratorServer:
         return img
 
     def response_to_client(self, bytes, con_id=0):
-        logger.debug(f"Send to client {len(bytes)} bytes.")
-        sock = self.connections[con_id]
-        sock.send(bytes)
-        logger.debug(f"Send zero.")
-        sock.send(''.encode())
-        logger.debug("Done")
+        conn = self.connections[con_id]
+        send_bytes(conn, bytes)
 
 
 def main():

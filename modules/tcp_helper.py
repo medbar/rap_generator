@@ -3,7 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 HEADER_LEN = 4
-
+pack
 
 def send_bytes(sock, bytes):
     data_len = len(bytes)
@@ -11,10 +11,10 @@ def send_bytes(sock, bytes):
     header = struct.pack('!i', data_len)
 
     logger.debug("Send header {}".format(header))
-    sock.send(header)
+    sock.sendall(header)
 
     logger.debug("Send data")
-    sock.send(bytes)
+    sock.sendall(bytes)
     logger.debug("Done")
 
 
@@ -24,10 +24,11 @@ def recv_bytes(sock):
         logger.info("Got zero header")
         return
     logger.debug("Got header {}".format(header))
-    data_len = struct.unpack('!i', header)
+    data_len = struct.unpack('!i', header)[0]
     logger.debug("Data len is {}".format(data_len))
 
     data = sock.recv(data_len)
+    logger.debug("Got {} bytes".format(len(data)))
     if not data:
         logger.info("Got zero data")
         return

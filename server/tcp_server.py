@@ -6,6 +6,9 @@ import io
 from PIL import Image
 import time
 
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
 from modules.tcp_helper import send_bytes, recv_bytes
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.DEBUG,
@@ -76,7 +79,7 @@ class RapGeneratorServer:
         if self.debug:
             t = str(time.time())
             name = os.path.join(self.args.tmp_dir, t + "." + self.args.img_format)
-            logger.info(f"Saving  image to {name}")
+            logger.info(f"Saving image to {name}")
             img.save(name)
         return img
 

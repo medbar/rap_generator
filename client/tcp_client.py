@@ -7,7 +7,7 @@ import logging
 from client.camera import Camera
 from client.audio_player import AudioPlayer
 logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.DEBUG,
 )
 logger = logging.getLogger(__name__)
 
@@ -18,11 +18,6 @@ class TCPClient:
         parser.add_argument("--port", default=9090, type=int)
         parser.add_argument('--host', default='0.0.0.0', type=str)
         parser.add_argument('--recv_bsize', type=int, default=1024)
-        parser.add_argument('--img_size', type=str, default='100,100')
-        parser.add_argument('--img_mode', type=str, default='RGB')
-        parser.add_argument('--img_format', type=str, default='jpeg')
-        parser.add_argument('--tmp_dir', type=str, default='tmp')
-        parser.add_argument('--no_debug', action='store_true', default=False)
 
     def __init__(self, args):
         self.args = args
@@ -38,8 +33,11 @@ class TCPClient:
         self.send_bytes(bytes)
 
     def send_bytes(self, bytes):
+        logger.debug("Send to server {} bytes".format(len(bytes)))
         self.socket.send(bytes)
+        logger.debug("Send zero")
         self.send_zero()
+        logger.debug("Send done")
 
     def send_zero(self):
         self.socket.send(''.encode())
@@ -65,12 +63,14 @@ def main():
     client = TCPClient(args)
     camera = Camera(args)
     player = AudioPlayer(args)
-    player.all_minuses()
+    logger.info(vars(args))
+    player.load_all_bg_sounds()
 
     for img in camera.loop():
         client.send_img(img)
+        logger.debug("Waiting response from server")
         music_bytes = client.get_response()
-        logger.info('Bytes len is {}'.format(len(music_bytes)))
+        logger.debug("Response contains {} bytes".format(len(music_bytes)))
         player.play_sound_from_bytes(music_bytes)
 
 

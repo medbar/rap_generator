@@ -3,3 +3,4 @@ anaconda
 apex
 anaconda
 modules/text_generator/ru_gpts
+__pycache__

@@ -32,16 +32,14 @@ class GPT3Generator:
     def add_args(parser):
         parser.add_argument(
             "--model_type",
-            default=None,
+            default="gpt2",
             type=str,
-            required=True,
             help="Model type selected in the list: " + ", ".join(MODEL_CLASSES.keys()),
         )
         parser.add_argument(
             "--model_name_or_path",
-            default=None,
+            default="sberbank-ai/rugpt3small_based_on_gpt2",
             type=str,
-            required=True,
             help="Path to pre-trained model or shortcut name selected in the list: " + ", ".join(MODEL_CLASSES.keys()),
         )
 
@@ -59,7 +57,7 @@ class GPT3Generator:
             "--repetition_penalty", type=float, default=1.0,
             help="primarily useful for CTRL model; in that case, use 1.2"
         )
-        parser.add_argument("--k", type=int, default=0)
+        parser.add_argument("--k", type=int, default=10)
         parser.add_argument("--p", type=float, default=0.9)
 
         parser.add_argument("--padding_text", type=str, default="", help="Padding text for Transfo-XL and XLNet.")
@@ -148,8 +146,8 @@ def main():
     GPT3Generator.add_args(parser)
 
     # Loading default options
-    args = GPT3Generator.get_default_args(parser)
-    # args = parser.parse_args()
+    # args = GPT3Generator.get_default_args(parser)
+    args = parser.parse_args()
 
     generator = GPT3Generator(args)
     logger.info(args)

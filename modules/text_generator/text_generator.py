@@ -1,1 +1,0 @@
-from modules.text_generator.ru_gpts import

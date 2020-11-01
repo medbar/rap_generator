@@ -10,6 +10,8 @@ from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 from modules.tcp_helper import send_bytes, recv_bytes
+from modules.text_to_speech import Text2Speech
+from modules.text_generator.generate_transformers import GPT3Generator
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s", datefmt="%m/%d/%Y %H:%M:%S", level=logging.DEBUG,
 )
@@ -97,19 +99,32 @@ class RapGeneratorServer:
 def main():
     parser = argparse.ArgumentParser()
     RapGeneratorServer.add_args(parser)
+    Text2Speech.add_args(parser)
+    GPT3Generator.add_args(parser)
+
     args = parser.parse_args()
+
     server = RapGeneratorServer(args)
+    tts = Text2Speech(args)
+    text_gen = GPT3Generator(args)
+
     logger.info(vars(args))
-    with open('audio/stc-cloud_tts.wav', 'rb') as f:
-        answ = f.read()
+    # with open('audio/stc-cloud_tts.wav', 'rb') as f:
+    #   answ = f.read()
     try:
         while True:
             logger.info("Wait to new connection...")
             server.accept()
             for img in server.listen():
                 logger.debug("Process image")
-                #TODO real answ
-                server.response_to_client(answ)
+                # TODO real answ
+                context = "Рэп - это круто"
+
+                generated_text = text_gen.generate_next(context)
+
+                generated_wat = tts.synthesize(generated_text, tts.get_random_voice())
+
+                server.response_to_client(generated_wat)
     finally:
         server.sock.close()
 

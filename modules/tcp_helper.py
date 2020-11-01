@@ -3,7 +3,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 HEADER_LEN = 4
-pack
 
 def send_bytes(sock, bytes):
     data_len = len(bytes)

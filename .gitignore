@@ -3,4 +3,5 @@ anaconda
 apex
 anaconda
 modules/text_generator/ru_gpts
+modules/object_detect/models
 __pycache__
